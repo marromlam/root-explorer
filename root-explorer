@@ -24,6 +24,6 @@ Y=`bc <<<"scale=0; 1"`
 
 SCRIPT="${SCRIPTPATH}/python/root-explorer.py"
 
-python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE | fzf -m --preview="python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch {} | xargs kitty +kitten icat --scale-up --place ${WIDTH}x${WIDTH}@${X}x${Y} --transfer-mode=file" | xargs python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch | xargs kitty +kitten icat 
+python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE | fzf -m --preview="python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch {} | xargs kitty +kitten icat --scale-up --place ${WIDTH}x${WIDTH}@${X}x${Y} --transfer-mode=stream" | xargs python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch | xargs kitty +kitten icat 
 
 # vim: ft=sh
