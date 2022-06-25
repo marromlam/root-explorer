@@ -16,13 +16,13 @@ import numpy as np
 plt.rcParams["figure.figsize"] = (8, 6)
 
 
-def hist2plot(arr, branch, filename):
+def hist2plot(arr, branch, filename, color):
     # remove null values
     _arr = arr[arr != -99999.]
     if len(_arr) > 0:
         lower_limit, upper_limit = np.min(_arr), np.max(_arr)
-        plt.hist(_arr, 100, range=(lower_limit, upper_limit))
-    plt.xlabel(branch)
+        plt.hist(_arr, 100, range=(lower_limit, upper_limit), color=color,
+                 alpha=0.5)
     # add info
     # fig.set_size_inches(18.5, 10.5)
     plt.tight_layout()
@@ -30,27 +30,30 @@ def hist2plot(arr, branch, filename):
     plt.gcf().text(0.1, 0.04+2e-2, f"Standard: {np.std(_arr)}")
     plt.gcf().text(0.1, 0.00+2e-2, f"Lenght: {len(_arr)}")
     plt.subplots_adjust(bottom=0.2)
-    plt.savefig(filename, dpi=200, transparent=False)
+    return
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--tfile")
     p.add_argument("--ttree", default=False)
-    p.add_argument("--tbranch", default=False)
+    p.add_argument("--tbranch", nargs="+", default=False)
     args = vars(p.parse_args())
 
     tfile = uproot.open(args["tfile"])
 
     if args["tbranch"]:
-        tbranch = args['tbranch'].split(' :: ')
-        if len(tbranch) > 1:
-            ttree, tbranch = tbranch
-        else:
-            ttree, tbranch = args['ttree'], tbranch[0]
-        arr = np.array(tfile[ttree].array(tbranch))
-        filename = "/tmp/root-browser-plot.png"
-        hist2plot(arr, tbranch, filename)
+        plt.xlabel(" and ".join(args["tbranch"]))
+        for i, _branch in enumerate(args['tbranch']):
+            tbranch = _branch.split('::')
+            if len(tbranch) > 1:
+                ttree, tbranch = tbranch
+            else:
+                ttree, tbranch = args['ttree'], tbranch[0]
+            arr = np.array(tfile[ttree].array(tbranch))
+            filename = "/tmp/root-browser-plot.png"
+            hist2plot(arr, tbranch, filename, f"C{i}")
+            plt.savefig(filename, dpi=200, transparent=False)
         print(filename)
     else:
         if not args['ttree'] or args['ttree'] == '0':
@@ -60,7 +63,7 @@ if __name__ == "__main__":
         all_branches = []
         for t in ttrees:
             _branches = [k.decode() for k in tfile[t].keys()]
-            all_branches.append([f"{t} :: {b}" for b in _branches])
+            all_branches.append([f"{t}::{b}" for b in _branches])
         print("\n".join(sum(all_branches, [])))
 
 
