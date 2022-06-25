@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+ROOT_FILE=$1
+if [ -z "$2" ]
+  then
+    ROOT_TREE=0
+else
+    ROOT_TREE=$2
+fi
+
+read -r LINES COLUMNS < <(stty size)
+
+# compute dimensions and positions for the plot
+WIDTH=`bc <<<"scale=0; $COLUMNS / 2 - 2"`
+HEIGHT=`bc <<<"scale=0; $LINES / 4"`
+X=`bc <<<"scale=0; $COLUMNS / 2 + 1"`
+Y=`bc <<<"scale=0; 1"`
+
+SCRIPT="python/root-explorer.py"
+
+python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE | fzf --preview="python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch {} | xargs kitty +kitten icat --scale-up --place ${WIDTH}x${WIDTH}@${X}x${Y} --transfer-mode=file"
+
+# vim: ft=sh
