@@ -13,10 +13,13 @@ import matplotlib.pyplot as plt
 import uproot3 as uproot
 import numpy as np
 
+from os import listdir, remove
+from os.path import isfile, join
+
 plt.rcParams["figure.figsize"] = (8, 6)
 
 
-def hist2plot(arr, branch, filename, color):
+def hist2plot(arr, color):
     # remove null values
     _arr = arr[arr != -99999.]
     if len(_arr) > 0:
@@ -43,7 +46,13 @@ if __name__ == "__main__":
     tfile = uproot.open(args["tfile"])
 
     if args["tbranch"]:
-        plt.xlabel(" and ".join(args["tbranch"]))
+        label = " and ".join(args["tbranch"])
+        plt.xlabel(label)
+        onlyfiles = [f for f in listdir("/tmp") if isfile(join("/tmp", f))]
+        for f in onlyfiles:
+            if f.startswith('root-explorer'):
+                remove(join("/tmp", f))
+        filename = f"/tmp/root-explorer-{hash(label)}.png"
         for i, _branch in enumerate(args['tbranch']):
             tbranch = _branch.split('::')
             if len(tbranch) > 1:
@@ -51,8 +60,7 @@ if __name__ == "__main__":
             else:
                 ttree, tbranch = args['ttree'], tbranch[0]
             arr = np.array(tfile[ttree].array(tbranch))
-            filename = "/tmp/root-browser-plot.png"
-            hist2plot(arr, tbranch, filename, f"C{i}")
+            hist2plot(arr, f"C{i}")
             plt.savefig(filename, dpi=200, transparent=False)
         print(filename)
     else:
