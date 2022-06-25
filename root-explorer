@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Absolute path to this script, e.g. /home/user/bin/foo.sh
+SCRIPT=$(readlink -f "$0")
+# Absolute path this script is in, thus /home/user/bin
+SCRIPTPATH=$(dirname "$SCRIPT")
+
+
 ROOT_FILE=$1
 if [ -z "$2" ]
   then
@@ -16,7 +22,7 @@ HEIGHT=`bc <<<"scale=0; $LINES / 4"`
 X=`bc <<<"scale=0; $COLUMNS / 2 + 1"`
 Y=`bc <<<"scale=0; 1"`
 
-SCRIPT="python/root-explorer.py"
+SCRIPT="${SCRIPTPATH}/python/root-explorer.py"
 
 python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE | fzf --preview="python3 $SCRIPT --tfile $ROOT_FILE --ttree $ROOT_TREE --tbranch {} | xargs kitty +kitten icat --scale-up --place ${WIDTH}x${WIDTH}@${X}x${Y} --transfer-mode=file"
 
