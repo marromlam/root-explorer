@@ -8,10 +8,8 @@ __email__ = ["email"]
 
 
 import argparse
-# import complot
 
 import matplotlib.pyplot as plt
-# import numpy as np
 import uproot3 as uproot
 import numpy as np
 
