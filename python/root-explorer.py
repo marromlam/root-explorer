@@ -42,19 +42,26 @@ if __name__ == "__main__":
 
     tfile = uproot.open(args["tfile"])
 
-    if not args['ttree'] or args['ttree'] == '0':
-        ttree = list(tfile.keys())[0]
-    else:
-        ttree = args['ttree']
-
     if args["tbranch"]:
-        arr = np.array(tfile[ttree].array(args["tbranch"]))
+        tbranch = args['tbranch'].split(' :: ')
+        if len(tbranch) > 1:
+            ttree, tbranch = tbranch
+        else:
+            ttree, tbranch = args['ttree'], tbranch[0]
+        arr = np.array(tfile[ttree].array(tbranch))
         filename = "/tmp/root-browser-plot.png"
-        hist2plot(arr, args["tbranch"], filename)
+        hist2plot(arr, tbranch, filename)
         print(filename)
     else:
-        arr = tfile[ttree].keys()
-        print("\n".join([k.decode() for k in arr]))
+        if not args['ttree'] or args['ttree'] == '0':
+            ttrees = [t.decode().split(';')[0] for t in list(tfile.keys())]
+        else:
+            ttrees = [args['ttree']]
+        all_branches = []
+        for t in ttrees:
+            _branches = [k.decode() for k in tfile[t].keys()]
+            all_branches.append([f"{t} :: {b}" for b in _branches])
+        print("\n".join(sum(all_branches, [])))
 
 
 # vim: fdm=marker ts=2 sw=2 sts=2 sr et
