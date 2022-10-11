@@ -19,14 +19,14 @@ from os.path import isfile, join
 plt.rcParams["figure.figsize"] = (8, 6)
 
 
-def hist2plot(arr, color):
+def hist2plot(arr, color, density):
     # remove null values
     _arr = np.array(arr[:,0] if arr.ndim > 1 else arr)
     _arr = _arr[_arr != -99999.0]
     if len(_arr) > 0:
         lower_limit, upper_limit = np.min(_arr), np.max(_arr)
         plt.hist(_arr, 100, range=(lower_limit, upper_limit), color=color,
-                 alpha=0.5)
+                 alpha=0.5, density=density)
     # add info
     # fig.set_size_inches(18.5, 10.5)
     plt.tight_layout()
@@ -62,7 +62,8 @@ if __name__ == "__main__":
             else:
                 ttree, tbranch = args["ttree"], tbranch[0]
             arr = tfile[ttree].arrays(tbranch)
-            hist2plot(arr[tbranch], f"C{i}")
+            hist2plot(arr[tbranch], f"C{i}",
+                      density=True if len(args["tbranch"]) > 1 else False)
             plt.savefig(filename, dpi=200, transparent=False)
         print(filename)
     else:
